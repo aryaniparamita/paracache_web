@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link href="css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" type="text/css" href="css/analysis.css">
+<link rel="stylesheet" href="fonts/font-awesome/css/font-awesome.min.css">
+<script type="text/javascript" src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<script type="text/javascript" src="js/analysis.js" ></script>
+<script type="text/javascript" src="js/general.js" ></script>
+<title> Cache Type Analysis</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+
+    <!-- Bootstrap core CSS -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <link href="css/ie10-viewport-bug-workaround.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="offcanvas.css" rel="stylesheet">
+
+    <!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
+    <!--[if lt IE 9]><script src="../../assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
+ 
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    <link rel="stylesheet" type="text/css" href="css/css.css">
+</head>
+<body>
+    <div id="curve_chart"></div>
+<nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="start.html">ParaCache</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <ul class="nav navbar-nav navbar-right">
+            <li><a href="dmc.html">Direct Mapped Cache</a></li>
+            <li><a href="fa.html">Fully Associative Cache</a></li>
+            <li><a href="sa2.html">2-Way SA </a></li>
+            <li><a href="sa4.html">4-Way SA</a></li>
+            <li><a href="analysis.html">Cache Type Analysis</a></li>
+            <li><a href="vm.html">Virtual Memory</a></li>
+            <li><a href="kb.pdf">Knowledge Base</a></li>
+            <li><a href="https://goo.gl/forms/s9XHMQXfQxsMawaN2">Feedback</a></li> 
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+
+<div class="row row-offcanvas row-offcanvas-left">
+
+    <div class="col-sm-12 col-md-3" id="sidebar">
+		<div class="col-sm-6 col-md-2 configurationTab">
+            <div>
+                    <label class="col-xs-4 col-sm-4 reppol"></label>
+                    <label class="col-xs-4 col-sm-4 reppol"><input type="radio" id="ReplacementPolicy"  name="ReplacementPolicy" onchange="adjustLRU()" value="FIFO" checked> FIFO </input></label>	
+                    <label class="col-xs-4 col-sm-4 reppol"><input type="radio" id="ReplacementPolicy"  name="ReplacementPolicy" onchange="adjustLRU()"  value="LRU"> LRU </input></label>
+
+			</div>
+			<div><label class="col-xs-8 col-sm-8 labels" name="Memory Size"> Memory Size <font size=-4>(power of 2)</font></label><input class="col-xs-4 col-sm-4" type="text" name="memorysize" id="memorysize"  value=2048 /> </div>
+			<div><label class="col-xs-8 col-sm-8 labels" name="Offset Size"> Offset Bits <font size=-4></font></label> <input class="col-xs-4 col-sm-4" type="text" name="offsetsize" id="offsetsize"  value=2 /></div>
+		</div>
+		<!------------- Cache Configuration --------------------->
+		<div  class="col-xs-12 col-sm-12 cacheVM">
+			<label class="col-xs-4 col-sm-4 labels" name="title"> Cache 1 </label>
+			<select id="cache1type" name="cache1type" class="col-xs-8 col-sm-8">
+				<option value=0> Direct Mapped Cache </option>
+				<option value=1> Fully Associative Cache </option>
+				<option value=2> 2-Way Set Associative Cache </option>
+				<option value=3> 4-Way Set Associative Cache </option>
+			</select>
+		</div>
+		<div class="col-xs-12 col-sm-12 cacheVM">
+			<label class="col-xs-8 col-sm-8 labels" name="size">Size <font size=-4>(in hex)</font> # </label>
+			<input  class="col-xs-4 col-sm-4" type="text" name="cache1_size" id="cache1_size"  value=16 />
+		</div>
+		
+		<div  class="col-xs-12 col-sm-12 cacheVM">
+			<label class="col-xs-4 col-sm-4 labels" name="title"> Cache 2 </label>
+			<select id="cache2type" name="cache2type" class="col-xs-8 col-sm-8">
+				<option value=0> Direct Mapped Cache </option>
+				<option value=1> Fully Associative Cache </option>
+				<option value=2> 2-Way Set Associative Cache </option>
+				<option value=3> 4-Way Set Associative Cache </option>
+			</select>
+		</div>
+		<div class="col-xs-12 col-sm-12 cacheVM">
+			<label class="col-xs-8 col-sm-8 labels" name="size">Size <font size=-4>(in hex)</font> # </label>
+			<input  class="col-xs-4 col-sm-4" type="text" name="cache2_size" id="cache2_size"  value=16 />
+		</div>
+
+		
+		<div  class="col-xs-12 col-sm-12 cacheVM">
+			<label class="col-xs-4 col-sm-4 labels" name="title"> Cache 3 </label>
+			<select id="cache3type" name="cache3type" class="col-xs-8 col-sm-8">
+				<option value=0> Direct Mapped Cache </option>
+				<option value=1> Fully Associative Cache </option>
+				<option value=2> 2-Way Set Associative Cache </option>
+				<option value=3> 4-Way Set Associative Cache </option>
+			</select>          
+		</div>               
+		<div class="col-xs-12 col-sm-12 cacheVM">
+			<label class="col-xs-8 col-sm-8 labels" name="size">Size <font size=-4>(in hex)</font> # </label>
+			<input  class="col-xs-4 col-sm-4" type="text" name="cache3_size" id="cache3_size"  value=16 />
+		</div>
+
+		
+		<div  class="col-xs-12 col-sm-12 cacheVM">
+			<label class="col-xs-4 col-sm-4 labels" name="title"> Cache 4 </label>
+			<select id="cache4type" name="cache4type" class="col-xs-8 col-sm-8">
+				<option value=0> Direct Mapped Cache </option>
+				<option value=1> Fully Associative Cache </option>
+				<option value=2> 2-Way Set Associative Cache </option>
+				<option value=3> 4-Way Set Associative Cache </option>
+			</select>
+		</div>
+		<div class="col-xs-12 col-sm-12 cacheVM">
+			<label class="col-xs-8 col-sm-8 labels" name="size">Size <font size=-4>(in hex)</font> # </label>
+			<input  class="col-xs-4 col-sm-4" type="text" name="cache4_size" id="cache4_size"  value=16 />
+		</div>
+            
+            
+            
+            
+		<div class="col-xs-12 col-sm-12 cacheVM submit">
+			<button class="col-xs-12 col-sm-12 onsubmit1" id="rndButton" onclick="rndConfiguration()">Gen. Random Configuration</button>
+			<button class="col-xs-6 col-sm-6 onsubmit2" onclick="resetConfigurationAnalysis()">Reset</button>
+			<button class="col-xs-6 col-sm-6 onsubmit2" id="submitConfig" onclick="loadConfiguration()">Submit</button>				
+
+		</div>
+
+		<!-----------------------STATISTICS ---------------------------->
+		<div class="col-sm-6 col-md-2 hitmiss" id="hitmiss">
+		<b>	List of Previous Instructions :  </b>
+				<label  class="col-xs-12 col-sm-12 "id="listOfInstructionsLabel"> </label> 
+		</div>
+
+
+	</div>
+	<!------------------------------RIGHT SIDE-------------------------------------------->
+	
+	<div class="col-sm-12 col-md-9">
+	<!------------HEADER ----------------------------------->
+		<div class="col-sm-12 col-md-10 header">
+		<h3><i class="fa fa-sliders" aria-hidden="true"></i>
+							<font face="titleFont"> Cache Type Analysis </font></h3>
+		</div>
+	<!-----------------------CURRENT INSTRUCTION --------------------->
+     	<div class="col-sm-12 col-md-12" style="display:inline-block;">
+		<div id="currentInstruction" class="col-sm-12 col-md-3 currentInstruction">
+            <h4><i class="fa fa-th-large" aria-hidden="true"></i> Current Instruction (in Hex)</h4>
+            <div id="currentInstructionDiv" class="currentInstructionDiv">  </div>
+        </div>
+		<div id="listOfInstruction" class="col-sm-12 col-md-8 listOfInstruction">
+			<div id="memoryheader" class="col-sm-12 col-md-12 listOfInstructionHeader">
+				<h4><i class="fa fa-th-large" aria-hidden="true"></i> List of instructions (in Hex) | Split by comma </h4>
+			</div>
+				<div id="instructionblock" class="col-sm-12 col-md-12 instructionblock">
+					<textarea class="analysisInstructionTextArea" id="analysisInstructionTA"> </textarea>
+					<div class ="submit">
+                        <button class="col-sm-4 col-md-4 onsubmit3" id="rndIns" onclick="randomArray()">Gen. 88 Random Instructions</button>
+                        <button class="col-sm-2 col-md-2 onsubmit3" id="submit" onclick="breakInstruction()">Submit</button>
+                        <button class="col-sm-2 col-md-2 onsubmit3" id="nextIns" onclick="nextInstruction()">Next Instruction</button>
+						<button class="col-sm-2 col-md-2 onsubmit3" id="ffIns" onclick="ffInstruction()">Fast Forward</button>
+						<button class="col-sm-2 col-md-2 onsubmit3" id="resetIns" onclick="resetInstruction()">Reset </button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!----------------ANALYSIS ------------------------------->
+		<div id="container" class="col-sm-12 col-md-12 inner_container">
+					 <h3  class="col-sm-12 col-md-12"> <i class="fa fa-table" aria-hidden="true"></i> Cache Comparison </u></h3>
+			<div id="tableSpace" class="tableSpace">
+                <table class=drawtable id=cachetable>
+                    <tr><td> Index </td> <td> Valid </td><td> Tag </td> <td> Data (Hex) </td></tr>
+                </table>
+            </div>
+		</div>
+    </div>
+    <div class="chart">	
+        <div class="chart_icon"><i class="fa fa-signal" aria-hidden="true" onclick=graph()></i></div>
+    </div>
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="js/ie10-viewport-bug-workaround.js"></script>
+    <script src="offcanvas.js"></script>
+</body>
+</html>
